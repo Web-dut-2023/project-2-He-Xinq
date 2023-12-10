@@ -29,6 +29,7 @@
                 </form>
             {% endif %}
 
+
             {% if isListingInWatchlist %}
                 <form action="{% url 'removeWatchlist' id=listing.id %}" method="POST">
                     {% csrf_token %}
