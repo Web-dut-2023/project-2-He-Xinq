@@ -1,16 +1,35 @@
 {% extends "auctions/layout.html" %}
+{% load static %}
 {% block body %}
-    <h2>Watchlist</h2>
-    <div class="row mx-3">
-        {% for listing in listings %}
-            <div class="card mx-3" style="width: 18rem;">
-                <img src="{{listing.imageUrl}}" class="card-img-top" alt="{{listing.title}}">
-                <div class="card-group">
-                    <h5 class="card-title">{{Listing.title}}</h5>
-                    <p class="card-text">{{Listing.description}}</p>
-                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary">Details</a>
-                </div>
+    <h2>Watch List</h2>
+    {% for auction in watch_list %}
+        {% if auction.available %}
+        <a href="{% url 'listing' auction.id %}">
+            <div class="listening">
+
+                {% for n in auction.photos.all %}
+                    <img src="{% static n.url %}" width="250" height="250">
+                {% endfor %}
+                <h3>{{auction.name}}</h3>
+
+
+                <li>
+                    Starting price: {{auction.price}}
+                </li>
+                <li>
+                    Highest Bid: {{auction.current_bid}}
+                </li>
+
+                <li>
+                    Date of creation: {{auction.creation_date}}
+                </li>
+
+                {% if user.is_authenticated %}
+                <br>
+                    <a href="{% url 'watchlist_remove' auction.id %}" class="btn btn-secondary">Remove Item</a>
+                {% endif %}
             </div>
-        {% endif %}
-    </div>
+        </a>
+            {% endif %}
+        {% endfor %}
 {% endblock %}
