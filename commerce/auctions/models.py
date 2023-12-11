@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 
 class User(AbstractUser):
@@ -7,35 +8,56 @@ class User(AbstractUser):
 
 
 class Category(models.Model):
-    categoryName = models.CharField(max_length=50)
+    name = models.CharField(max_length=64)
 
     def __str__(self):
-        return self.categoryName
+        return f"{self.name}"
+
+
+class Photo(models.Model):
+    image_name = models.TextField()
+    url = models.TextField()
+
+    def __str__(self):
+        return f"{self.url}"
+
+
+class Auction(models.Model):
+    name = models.CharField(max_length=64)
+    current_bid = models.IntegerField()
+    creation_date = models.DateTimeField()
+    available = models.BooleanField()
+    description = models.CharField(max_length=64)
+    winner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name="winner")
+    photos = models.ManyToManyField(Photo, related_name='photos', blank=True)
+    auction_category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="categories")
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, related_name="creator")
+
+    def __str__(self):
+        return f"{self.id} {self.name}"
 
 
 class Bid(models.Model):
-    bid = models.IntegerField(default=0)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='userBid')
-
-
-class Listing(models.Model):
-    title = models.CharField(max_length=30)
-    description = models.CharField(max_length=300)
-    imageUrl = models.CharField(max_length=1000)
-    price = models.ForeignKey(Bid, on_delete=models.CASCADE, blank=True, null=True, related_name="bidPrice")
-    isActive = models.BooleanField(default=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='user')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, blank=True, null=True, related_name='category')
-    watchlist = models.ManyToManyField(User, blank=True, null=True, related_name="listingWatchlist")
+    price = models.IntegerField()
+    auction_bid = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="bids")
+    auctioner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auctioner")
 
     def __str__(self):
-        return self.title
+        return f"{self.price}"
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='userComment')
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=True, null=True, related_name='listingComment')
-    message = models.CharField(max_length=200)
+    commenter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="commenter")
+    comment_to = models.ForeignKey(Auction, on_delete=models.CASCADE, related_name="auction")
+    text = models.TextField()
 
     def __str__(self):
-        return f"{self.author} comment on {self.listing}"
+        return f"{self.commenter} {self.comment_to} {self.text}"
+
+
+class WatchList(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    auctions = models.ManyToManyField(Auction, related_name="auctions", blank=True)
+
+    def __str__(self):
+        return f"{self.user}'s watchlist'"
