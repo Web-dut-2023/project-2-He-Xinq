@@ -1,19 +1,22 @@
 from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 from . import views
+
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("<int:listing_id>", views.listing, name="listing"),
+    path("bid", views.bid, name="bid"),
+    path("<int:listing_id>/close", views.close, name="close"),
+    path("<int:listing_id>/auction_comment", views.auction_comment, name="auction_comment"),
+    path("categories", views.categories, name="categories"),
+    path("categories/<int:category_id>", views.categories_choose, name="categories_choose"),
     path("login", views.login_view, name="login"),
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
-    path("create", views.createListing, name="create"),
-    path("displayCategory", views.displayCategory, name="displayCategory"),
-    path("listing/<int:id>", views.listing, name="listing"),
-    path("removeWatchlist/<int:id>", views.removeWatchlist, name="removeWatchlist"),
-    path("addWatchlist/<int:id>", views.addWatchlist, name="addWatchlist"),
-    path("watchlist", views.displayWatchlist, name="watchlist"),
-    path("addComment/<int:id>", views.addComment, name="addComment"),
-    path("addBid/<int:id>", views.addBid, name="addBid"),
-    path("closeAuction/<int:id>", views.closeAuction, name="closeAuction")
+    path("watchlist", views.watchlist, name="watchlist"),
+    path("watchlist/<int:auction_id>", views.watchlist_add, name="watchlist_add"),
+    path("watchlist_remove/<int:auction_id>", views.watchlist_remove, name="watchlist_remove"),
+    path("create", views.create, name="create"),
 ]
